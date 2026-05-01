@@ -1,5 +1,8 @@
-# crawler-db
-Structured database of web crawler user agents for bot detection, filtering, and classification.
+# Crawlerdex
+
+> the bestiary of bots
+
+Structured database of 1500+ web crawler user agents for bot detection, filtering, and classification — paired with a live "bestiary" frontend that visualizes how often the top 25k sites block each one.
 
 ## crawlers.json
 
@@ -44,6 +47,27 @@ Array of crawler entries:
 | `http-library` | Generic HTTP client libraries | Medium–High |
 | `browser-automation` | Headless browsers, automation frameworks | Medium–High |
 | `academic` | Research and academic crawlers | Low |
+
+## Frontend (`index.html`)
+
+Single-file static "Crawlerdex" UI. Open directly or serve with `python3 -m http.server`.
+
+- Hero search → live filter across pattern/description/instances
+- Paste full `User-Agent` (>40 chars or contains `Mozilla`/`compatible;`) → regex match → longest-pattern wins
+- Category chips → tag filter (multi-select)
+- Card click → modal: description, regex, sample UAs, block-rate chart
+- Block-rate: fetched from [robots-radar](https://github.com/tn3w/robots-radar) `crawler-block-percentages.json` → SVG line+area chart over time, latest % pill
+- Favicons: DuckDuckGo `icons.duckduckgo.com/ip3/{domain}.ico` from each crawler's `url` (fallback: initials)
+- Aesthetic: Fraunces/JetBrains Mono, dotted paper bg, drifting bot emojis, hard offset shadows
+
+## Social preview banner
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install Pillow
+python banner.py
+```
 
 ## Credits
 
