@@ -2,7 +2,7 @@
 
 > the bestiary of bots
 
-Structured database of 1500+ web crawler user agents for bot detection, filtering, and classification — paired with a live "bestiary" frontend that visualizes how often the top 25k sites block each one.
+Structured database of 1600+ web crawler user agents for bot detection, filtering, and classification — paired with a live "bestiary" frontend that visualizes how often the top 25k sites block each one.
 
 ## crawlers.json
 
