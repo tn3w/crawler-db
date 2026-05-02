@@ -54,12 +54,16 @@ jobs:
       - name: Minify HTML
         run: |
           find docs -name '_*.html' -delete
-          find docs -name '*.html' | while read -r f; do
-            npx -y html-minifier-terser \
-              --collapse-whitespace --remove-comments \
-              --minify-css true --minify-js true \
-              -o "$f" "$f"
-          done
+          npm install --no-save --silent html-minifier-terser
+          export PATH="$PWD/node_modules/.bin:$PATH"
+          find docs -name '*.html' -print0 | \
+            xargs -0 -n1 -P"$(nproc)" \
+              bash -c '
+                html-minifier-terser \
+                  --collapse-whitespace --remove-comments \
+                  --minify-css true --minify-js true \
+                  -o "$0" "$0"
+              '
 
       - uses: actions/configure-pages@v5
 
