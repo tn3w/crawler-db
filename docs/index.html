@@ -3,7 +3,45 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>Crawlerdex: the bestiary of bots</title>
+        <title>Crawlerdex — the bestiary of 1500+ web crawler user agents</title>
+        <meta
+            name="description"
+            content="Searchable database of 1500+ web crawler user agents — Googlebot, GPTBot, Bingbot, ClaudeBot and more. Detection regex, real User-Agent strings, and live block-rate across the top 25 000 sites."
+        />
+        <meta
+            name="keywords"
+            content="web crawler database, user agent list, bot detection, GPTBot, Googlebot, Bingbot, ClaudeBot, robots.txt, AI crawler, SEO bot, scraper detection, user-agent regex"
+        />
+        <meta name="robots" content="index,follow,max-image-preview:large" />
+        <link rel="canonical" href="https://crawlerdex.tn3w.dev/" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Crawlerdex — the bestiary of 1500+ web crawlers" />
+        <meta
+            property="og:description"
+            content="Search 1500+ web crawler user-agents. Paste a User-Agent, get the bot. Live block-rate across top 25k sites."
+        />
+        <meta property="og:url" content="https://crawlerdex.tn3w.dev/" />
+        <meta property="og:site_name" content="Crawlerdex" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Crawlerdex — the bestiary of bots" />
+        <meta
+            name="twitter:description"
+            content="1500+ crawler user-agents, live block-rate, instant UA lookup."
+        />
+        <script type="application/ld+json">
+            {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "Crawlerdex",
+                "url": "https://crawlerdex.tn3w.dev/",
+                "description": "Searchable database of 1500+ web crawler user agents with live block-rate telemetry.",
+                "potentialAction": {
+                    "@type": "SearchAction",
+                    "target": "https://crawlerdex.tn3w.dev/?q={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                }
+            }
+        </script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -284,6 +322,9 @@
                 gap: 14px;
             }
             .card {
+                display: block;
+                color: inherit;
+                text-decoration: none;
                 border: 2px solid var(--ink);
                 background: #fffaee;
                 padding: 16px;
@@ -628,6 +669,17 @@
                 gap: 8px;
             }
 
+            #crawler-index {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
             .loader {
                 text-align: center;
                 padding: 80px;
@@ -769,6 +821,13 @@
             <div class="sheet" id="sheet"></div>
         </div>
 
+        <nav id="crawler-index" aria-label="All indexed crawlers">
+            <h2>All indexed crawlers</h2>
+            <ul>
+                <!--CRAWLER_LINKS-->
+            </ul>
+        </nav>
+
         <script>
             const EMOJIS = [
                 '🤖',
@@ -846,6 +905,9 @@
                 s = s.replace(/\s+/g, ' ').trim();
                 s = s.replace(/[\/\-_]+$/, '').trim();
                 return s || c.pattern;
+            }
+            function slugify(n) {
+                return n.replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'crawler';
             }
             function initials(n) {
                 return (
@@ -935,15 +997,20 @@
       <h4>User-Agent lookup</h4>
       ${
           m
-              ? `<div class="ua-match" data-i="${crawlers.indexOf(m)}">
+              ? `<a class="ua-match" data-i="${crawlers.indexOf(m)}" href="/${encodeURIComponent(slugify(nameOf(m)))}" style="text-decoration:none;color:inherit">
         <div style="font-size:32px">🎯</div>
         <div><div style="font-weight:800;font-size:20px">${escapeHtml(nameOf(m))}</div>
         <div style="font-family:'JetBrains Mono',monospace;font-size:12px;opacity:.7">pattern: ${escapeHtml(m.pattern)}</div></div>
-      </div>`
+      </a>`
               : `<div style="font-style:italic">no pattern matched: could be a real browser, or an unknown bot.</div>`
       }
     </div>`;
-                    if (m) ua.querySelector('.ua-match').onclick = () => openDetail(m);
+                    if (m)
+                        ua.querySelector('.ua-match').onclick = (e) => {
+                            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+                            e.preventDefault();
+                            openDetail(m);
+                        };
                 }
 
                 const filtered = crawlers.filter((c) => {
@@ -982,7 +1049,7 @@
                                       ? 'md'
                                       : 'lo'
                                 : 'lo';
-                            return `<div class="card" data-i="${crawlers.indexOf(c)}">
+                            return `<a class="card" data-i="${crawlers.indexOf(c)}" href="/${encodeURIComponent(slugify(nm))}">
       <div class="head">
         <div class="ico">${fv ? `<img src="${fv}" onerror="this.parentNode.textContent='${initials(nm)}'">` : initials(nm)}</div>
         <div class="nm">${escapeHtml(nm)}</div>
@@ -992,7 +1059,7 @@
         <span class="tag-mini">${(c.tags || ['uncategorized'])[0]}</span>
         ${b ? `<span class="block-pill ${lvl}">${pct(b.latest)}% block</span>` : `<span style="opacity:.5">no data</span>`}
       </div>
-    </div>`;
+    </a>`;
                         })
                         .join('') +
                     (sorted.length > slice.length
@@ -1000,7 +1067,11 @@
                         : '');
 
                 r.querySelectorAll('.card').forEach((el) => {
-                    el.onclick = () => openDetail(crawlers[+el.dataset.i]);
+                    el.onclick = (e) => {
+                        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return;
+                        e.preventDefault();
+                        openDetail(crawlers[+el.dataset.i]);
+                    };
                 });
             }
 
@@ -1085,11 +1156,30 @@
             : `<div style="font-style:italic;opacity:.6;padding:14px;border:2px dashed var(--ink)">No block-rate data found for this crawler.</div>`
     }
 
+    <h3>About this crawler</h3>
+    <p style="font-size:15px;line-height:1.6;margin:0 0 6px">
+      <strong>${escapeHtml(nm)}</strong> is identified by the regex
+      <code class="pat">${escapeHtml(c.pattern)}</code> in the
+      <code>User-Agent</code> header. Tagged
+      <em>${escapeHtml((c.tags || ['uncategorized']).join(', '))}</em>.
+    </p>
+
+    <h3>Technical details</h3>
     <dl class="grid">
+      <dt>Name</dt><dd>${escapeHtml(nm)}</dd>
+      <dt>Pattern</dt><dd><code class="pat">${escapeHtml(c.pattern)}</code></dd>
+      <dt>Tags</dt><dd>${escapeHtml((c.tags || ['uncategorized']).join(', '))}</dd>
       ${c.url ? `<dt>Reference</dt><dd><a href="${escapeHtml(c.url)}" target="_blank" rel="noopener">${escapeHtml(c.url)}</a></dd>` : ''}
       ${c.addition_date ? `<dt>Added</dt><dd>${escapeHtml(c.addition_date)}</dd>` : ''}
       <dt>Instances</dt><dd>${(c.instances || []).length}</dd>
+      <dt>Permalink</dt><dd><a href="/${encodeURIComponent(slugify(nm))}">/${escapeHtml(slugify(nm))}</a></dd>
     </dl>
+
+    <h3>Block this crawler</h3>
+    <p style="font-size:14px;line-height:1.5;margin:0 0 8px">
+      Add to your <code>robots.txt</code> to disallow <strong>${escapeHtml(nm)}</strong>:
+    </p>
+    <div class="instance" style="white-space:pre-wrap">User-agent: ${escapeHtml(nm)}\nDisallow: /</div>
 
     ${
         (c.instances || []).length

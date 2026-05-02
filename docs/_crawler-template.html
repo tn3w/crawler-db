@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>{{TITLE}}</title>
+        <meta name="description" content="{{SEO_DESC}}" />
+        <meta name="keywords" content="{{KEYWORDS}}" />
+        <meta name="robots" content="index,follow,max-image-preview:large" />
+        <link rel="canonical" href="{{CANONICAL}}" />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content="{{TITLE}}" />
+        <meta property="og:description" content="{{SEO_DESC}}" />
+        <meta property="og:url" content="{{CANONICAL}}" />
+        <meta property="og:site_name" content="Crawlerdex" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="{{TITLE}}" />
+        <meta name="twitter:description" content="{{SEO_DESC}}" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=JetBrains+Mono:wght@400;600&display=swap"
+            rel="stylesheet"
+        />
+        <script type="application/ld+json">
+{{JSON_LD}}
+        </script>
+        <style>
+            :root {
+                --ink: #0d0c0a;
+                --paper: #f3ecd8;
+                --paper-2: #ebe1c6;
+                --accent: #ff5b1f;
+                --shadow: 6px 6px 0 var(--ink);
+            }
+            * { box-sizing: border-box; }
+            html, body {
+                margin: 0; padding: 0;
+                background: var(--paper); color: var(--ink);
+                font-family: 'Fraunces', serif;
+            }
+            body {
+                background-image:
+                    radial-gradient(circle at 1px 1px, rgba(0,0,0,.18) 1px, transparent 0),
+                    linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+                background-size: 22px 22px, 100% 100%;
+                min-height: 100vh;
+            }
+            a { color: inherit; }
+            .wrap { max-width: 920px; margin: 0 auto; padding: 28px 24px 80px; }
+            header.top {
+                display: flex; justify-content: space-between; align-items: center;
+                margin-bottom: 32px;
+            }
+            .logo {
+                font-weight: 900; font-size: 22px; letter-spacing: -.5px;
+                display: flex; align-items: center; gap: 10px; text-decoration: none;
+            }
+            .logo .blip {
+                width: 12px; height: 12px; background: var(--accent);
+                border: 2px solid var(--ink); border-radius: 50%;
+                box-shadow: 2px 2px 0 var(--ink);
+            }
+            nav a {
+                margin-left: 18px; text-decoration: none; font-weight: 600;
+                font-family: 'JetBrains Mono', monospace; font-size: 13px;
+            }
+            .crumbs {
+                font-family: 'JetBrains Mono', monospace; font-size: 12px;
+                opacity: .6; margin-bottom: 14px;
+            }
+            .crumbs a { text-decoration: underline; }
+            .head-row {
+                display: flex; gap: 18px; align-items: center; margin-bottom: 8px;
+            }
+            .ico {
+                width: 64px; height: 64px; border: 3px solid var(--ink);
+                background: var(--paper-2); display: flex; align-items: center;
+                justify-content: center; font-weight: 900; font-size: 24px;
+                overflow: hidden; flex-shrink: 0;
+            }
+            .ico img { width: 100%; height: 100%; object-fit: cover; }
+            h1 {
+                font-size: clamp(40px, 8vw, 84px); line-height: .9; margin: 0;
+                font-weight: 900; letter-spacing: -2px;
+                font-variation-settings: 'opsz' 144, 'SOFT' 100;
+            }
+            h1 em { font-style: italic; color: var(--accent); }
+            .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+            .tag-mini {
+                border: 1px solid var(--ink); padding: 3px 10px;
+                border-radius: 999px; font-family: 'JetBrains Mono', monospace;
+                font-size: 12px; text-decoration: none;
+            }
+            .pat {
+                font-family: 'JetBrains Mono', monospace;
+                background: var(--ink); color: var(--paper);
+                padding: 4px 10px; font-size: 13px;
+            }
+            .lede { font-size: 20px; line-height: 1.5; margin: 14px 0 0; }
+            h2 {
+                font-size: 13px; font-family: 'JetBrains Mono', monospace;
+                letter-spacing: 1.5px; text-transform: uppercase;
+                margin: 36px 0 12px; padding-bottom: 6px;
+                border-bottom: 2px solid var(--ink);
+            }
+            .grid {
+                display: grid; grid-template-columns: 140px 1fr; gap: 8px 18px;
+                font-size: 15px;
+            }
+            .grid dt {
+                font-family: 'JetBrains Mono', monospace; text-transform: uppercase;
+                font-size: 11px; letter-spacing: 1px; opacity: .6; padding-top: 4px;
+            }
+            .grid dd { margin: 0; word-break: break-all; }
+            .instance {
+                font-family: 'JetBrains Mono', monospace; font-size: 12px;
+                background: #fffaee; border: 1px solid var(--ink);
+                padding: 8px 10px; margin-bottom: 6px; word-break: break-all;
+                line-height: 1.4; white-space: pre-wrap;
+            }
+            .more { font-size: 13px; opacity: .7; margin-top: 8px; }
+            .back {
+                display: inline-block; margin-top: 32px; padding: 10px 18px;
+                border: 2px solid var(--ink); background: var(--ink);
+                color: var(--paper); text-decoration: none; font-weight: 700;
+                font-family: 'JetBrains Mono', monospace; font-size: 13px;
+                letter-spacing: 1px; transition: transform .12s;
+            }
+            .back:hover {
+                transform: translate(-2px,-2px);
+                box-shadow: 4px 4px 0 var(--accent);
+            }
+            footer {
+                margin-top: 60px; padding-top: 24px; border-top: 2px solid var(--ink);
+                font-family: 'JetBrains Mono', monospace; font-size: 12px;
+                display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="wrap">
+            <header class="top">
+                <a class="logo" href="/"><span class="blip"></span> Crawlerdex</a>
+                <nav>
+                    <a href="/">All crawlers</a>
+                    <a href="https://github.com/tn3w/Crawlerdex">GitHub →</a>
+                </nav>
+            </header>
+
+            <div class="crumbs">
+                <a href="/">bestiary</a> / {{NAME}}
+            </div>
+
+            <div class="head-row">
+                <div class="ico">{{ICON}}</div>
+                <h1><em>{{NAME}}</em></h1>
+            </div>
+
+            <div class="meta">
+                {{TAGS_HTML}}
+                <span class="pat">{{PATTERN}}</span>
+            </div>
+
+            <p class="lede">{{DESCRIPTION}}</p>
+
+            <h2>About this crawler</h2>
+            <p style="font-size:16px;line-height:1.6">
+                <strong>{{NAME}}</strong> is a web crawler identified by the
+                regular-expression pattern <code class="pat">{{PATTERN}}</code>
+                in the <code>User-Agent</code> request header. It is categorised as
+                <em>{{TAGS_TEXT}}</em>. Use the regex above to detect, log, allow,
+                or block <strong>{{NAME}}</strong> traffic in your web server,
+                CDN edge rules, or <code>robots.txt</code>.
+            </p>
+
+            <h2>Technical details</h2>
+            <dl class="grid">
+                <dt>Name</dt><dd>{{NAME}}</dd>
+                <dt>Pattern</dt><dd><code class="pat">{{PATTERN}}</code></dd>
+                <dt>Tags</dt><dd>{{TAGS_TEXT}}</dd>
+                {{REF_ROW}}
+                {{ADDED_ROW}}
+                <dt>Instances</dt><dd>{{INSTANCE_COUNT}} known sample(s)</dd>
+            </dl>
+
+            <h2>Sample User-Agent strings</h2>
+            {{INSTANCES_HTML}}
+            {{EXTRA_INSTANCES}}
+
+            <h2>Block this crawler</h2>
+            <p style="font-size:15px;line-height:1.6">
+                Add the following to your <code>robots.txt</code> to disallow
+                <strong>{{NAME}}</strong>:
+            </p>
+            <div class="instance">User-agent: {{NAME}}
+Disallow: /</div>
+
+            <a class="back" href="/">← back to all crawlers</a>
+
+            <footer>
+                <span>© Crawlerdex · Apache 2.0</span>
+                <span>data: <a href="https://github.com/tn3w/Crawlerdex">Crawlerdex</a>
+                    + <a href="https://github.com/tn3w/robots-radar">robots-radar</a></span>
+            </footer>
+        </div>
+    </body>
+</html>

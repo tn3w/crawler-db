@@ -48,17 +48,42 @@ Array of crawler entries:
 | `browser-automation` | Headless browsers, automation frameworks | Medium–High |
 | `academic`           | Research and academic crawlers           | Low         |
 
-## Frontend (`index.html`)
+## Frontend (`docs/`)
 
-Single-file static "Crawlerdex" UI. Open directly or serve with `python3 -m http.server`.
+Static site deployed to [crawlerdex.tn3w.dev](https://crawlerdex.tn3w.dev) via GitHub Pages.
+
+| File | Purpose |
+| --- | --- |
+| `index.html` | Bestiary UI: search, UA paste-match, tag chips, modal w/ block-rate chart |
+| `404.html` | Themed not-found page |
+| `_crawler-template.html` | Placeholder template (`{{NAME}}`, `{{PATTERN}}`, …) for per-crawler page |
+| `CNAME` | Custom domain |
+| `robots.txt`, `sitemap.xml`, `<Crawler>.html` | Generated in CI by `tools/build_pages.py` (gitignored) |
 
 - Hero search → live filter across pattern/description/instances
-- Paste full `User-Agent` (>40 chars or contains `Mozilla`/`compatible;`) → regex match → longest-pattern wins
-- Category chips → tag filter (multi-select)
-- Card click → modal: description, regex, sample UAs, block-rate chart
-- Block-rate: fetched from [robots-radar](https://github.com/tn3w/robots-radar) `crawler-block-percentages.json` → SVG line+area chart over time, latest % pill
-- Favicons: DuckDuckGo `icons.duckduckgo.com/ip3/{domain}.ico` from each crawler's `url` (fallback: initials)
+- Paste full `User-Agent` (>40 chars or contains `Mozilla`/`compatible;`) → longest-pattern regex wins
+- Category chips → multi-select tag filter
+- Each card is `<a href="/<Name>">` → static SEO page (left-click intercepted → modal; cmd/ctrl/middle-click → page)
+- Block-rate: [robots-radar](https://github.com/tn3w/robots-radar) `crawler-block-percentages.json` → SVG line+area chart
+- Favicons: DuckDuckGo `icons.duckduckgo.com/ip3/{domain}.ico` (fallback: initials)
 - Aesthetic: Fraunces/JetBrains Mono, dotted paper bg, drifting bot emojis, hard offset shadows
+
+## Static SEO pages
+
+`tools/build_pages.py` reads `crawlers.json`, fills `docs/_crawler-template.html`, and writes:
+
+- `docs/<CrawlerName>.html` — one per crawler, with `<title>`, meta description, keywords, OpenGraph, JSON-LD `TechArticle`/`SoftwareApplication`, canonical URL
+- `docs/robots.txt` — `Allow: /` for `*` and every named crawler, plus sitemap link
+- `docs/sitemap.xml` — homepage + every crawler URL with `lastmod`
+
+Triggered by GitHub Actions (`.github/workflows/deploy-pages.yml`) on every push, release, robots-radar feed update, and daily cron.
+
+Run locally:
+
+```bash
+python3 tools/build_pages.py
+python3 -m http.server -d docs
+```
 
 ## Social preview banner
 

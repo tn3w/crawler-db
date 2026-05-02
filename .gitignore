@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Generated crawler pages (built in CI)
+docs/*.html
+!docs/index.html
+!docs/404.html
+!docs/_crawler-template.html
+docs/robots.txt
+docs/sitemap.xml

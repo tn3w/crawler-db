@@ -36,6 +36,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Download demo data
         run: |
           mkdir -p docs/data
@@ -43,6 +47,9 @@ jobs:
           curl -fsSL \
             https://github.com/tn3w/robots-radar/releases/latest/download/crawler-block-percentages.json \
             -o docs/data/crawler-block-percentages.json
+
+      - name: Build per-crawler SEO pages, robots.txt, sitemap.xml
+        run: python3 tools/build_pages.py
 
       - uses: actions/configure-pages@v5
 
