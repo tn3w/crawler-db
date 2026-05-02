@@ -227,6 +227,75 @@
                 line-height: 1.4;
                 white-space: pre-wrap;
             }
+            .chart {
+                border: 2px solid var(--ink);
+                background: #fffaee;
+                padding: 16px;
+                margin-top: 8px;
+            }
+            .chart .top {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                margin-bottom: 10px;
+            }
+            .chart .big {
+                font-size: 40px;
+                font-weight: 900;
+                letter-spacing: -1px;
+                line-height: 1;
+            }
+            .chart .big small {
+                font-size: 14px;
+                font-weight: 400;
+                opacity: 0.6;
+            }
+            .chart .meta-r {
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 11px;
+                opacity: 0.6;
+                text-align: right;
+            }
+            .chart svg {
+                width: 100%;
+                height: 160px;
+                display: block;
+            }
+            .chart .axis {
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 10px;
+                fill: var(--ink);
+                opacity: 0.6;
+            }
+            .chart .area {
+                fill: var(--accent);
+                opacity: 0.18;
+            }
+            .chart .line {
+                fill: none;
+                stroke: var(--accent);
+                stroke-width: 2.5;
+            }
+            .chart .dot {
+                fill: var(--accent);
+                stroke: var(--ink);
+                stroke-width: 1.5;
+            }
+            .chart .latest {
+                fill: var(--ink);
+            }
+            .chart .grid-l {
+                stroke: var(--ink);
+                stroke-dasharray: 2 4;
+                stroke-width: 1;
+                opacity: 0.25;
+            }
+            .nodata {
+                font-style: italic;
+                opacity: 0.6;
+                padding: 14px;
+                border: 2px dashed var(--ink);
+            }
             .more {
                 font-size: 13px;
                 opacity: 0.7;
@@ -312,6 +381,9 @@
                 rules, or <code>robots.txt</code>.
             </p>
 
+            <h2>Block-rate · top 25k sites</h2>
+            {{CHART_SECTION}}
+
             <h2>Technical details</h2>
             <dl class="grid">
                 <dt>Name</dt>
@@ -330,10 +402,19 @@
 
             <h2>Block this crawler</h2>
             <p style="font-size: 15px; line-height: 1.6">
-                Add the following to your <code>robots.txt</code> to disallow
-                <strong>{{NAME}}</strong>:
+                <strong>robots.txt</strong> — disallow <strong>{{NAME}}</strong>:
             </p>
             <div class="instance">User-agent: {{NAME}}&#10;Disallow: /</div>
+
+            <p style="font-size: 15px; line-height: 1.6; margin-top: 18px">
+                <strong>Apache</strong> <code>.htaccess</code> — return 403:
+            </p>
+            <div class="instance">RewriteEngine On&#10;RewriteCond %{HTTP_USER_AGENT} {{HTACCESS_PATTERN}} [NC]&#10;RewriteRule .* - [F,L]</div>
+
+            <p style="font-size: 15px; line-height: 1.6; margin-top: 18px">
+                <strong>Nginx</strong> — return 403 inside a <code>server</code> block:
+            </p>
+            <div class="instance">if ($http_user_agent ~* "{{NGINX_PATTERN}}") {&#10;    return 403;&#10;}</div>
 
             <a class="back" href="/" aria-label="Back to crawler bestiary index">
                 ← back to all crawlers

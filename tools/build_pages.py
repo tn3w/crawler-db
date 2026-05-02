@@ -13,6 +13,7 @@ from urllib.parse import quote
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 TEMPLATE_PATH = DOCS / "_crawler-template.html"
+BLOCKS_PATH = DOCS / "data" / "crawler-block-percentages.json"
 SITE = "https://crawlerdex.tn3w.dev"
 
 
@@ -63,6 +64,114 @@ def domain_of(url: str | None) -> str | None:
     return match.group(1) if match else None
 
 
+def fmt_pct(value: float) -> str:
+    decimals = 3 if value < 0.001 else 2 if value < 0.01 else 1
+    return f"{value * 100:.{decimals}f}"
+
+
+def block_key(crawler: dict, name: str, blocks: dict) -> str | None:
+    pattern = crawler.get("pattern", "")
+    instances = (crawler.get("instances") or [])[:3]
+    for candidate in [pattern, name, *instances]:
+        if candidate in blocks:
+            return candidate
+        lower = candidate.lower()
+        for key in blocks:
+            if key.lower() == lower:
+                return key
+    needle = name.lower().split(" ")[0]
+    if len(needle) < 3:
+        return None
+    for key in blocks:
+        if needle in key.lower():
+            return key
+    return None
+
+
+def chart_svg(series: dict[str, float]) -> str:
+    points = sorted((int(t), v) for t, v in series.items())
+    if not points:
+        return ""
+    width, height, pad = 820, 160, 28
+    xs = [p[0] for p in points]
+    ys = [p[1] for p in points]
+    xmin = xs[0]
+    xmax = xs[-1] if xs[-1] != xs[0] else xs[0] + 1
+    ymax = max(max(ys), 0.001) * 1.15
+
+    def x_at(t: int) -> float:
+        if xmax == xmin:
+            return pad + (width - pad * 2) * 0.5
+        return pad + (width - pad * 2) * (t - xmin) / (xmax - xmin)
+
+    def y_at(v: float) -> float:
+        return height - pad - (height - pad * 2) * (v / ymax)
+
+    path = " ".join(
+        f"{'L' if i else 'M'}{x_at(p[0]):.1f},{y_at(p[1]):.1f}"
+        for i, p in enumerate(points)
+    )
+    area = (
+        f"{path} L{x_at(xmax):.1f},{height - pad} "
+        f"L{x_at(xmin):.1f},{height - pad} Z"
+    )
+    grid_lines = "".join(
+        f'<line class="grid-l" x1="{pad}" x2="{width - pad}" '
+        f'y1="{pad + (height - pad * 2) * f}" '
+        f'y2="{pad + (height - pad * 2) * f}"/>'
+        for f in (0, 0.25, 0.5, 0.75, 1)
+    )
+    last = len(points) - 1
+    dots = "".join(
+        f'<circle class="{"latest" if i == last else "dot"}" '
+        f'cx="{x_at(p[0]):.1f}" cy="{y_at(p[1]):.1f}" '
+        f'r="{5 if i == last else 3}"/>'
+        for i, p in enumerate(points)
+    )
+
+    def fmt_date(timestamp: int) -> str:
+        return datetime.fromtimestamp(timestamp, timezone.utc).date().isoformat()
+
+    labels = (
+        f'<text class="axis" x="{pad}" y="{height - 6}">{fmt_date(xmin)}</text>'
+        f'<text class="axis" x="{width - pad}" y="{height - 6}" '
+        f'text-anchor="end">{fmt_date(xmax)}</text>'
+        f'<text class="axis" x="{pad}" y="{pad - 6}">{fmt_pct(ymax)}%</text>'
+    )
+    return (
+        f'<svg viewBox="0 0 {width} {height}" preserveAspectRatio="none">'
+        f'{grid_lines}<path class="area" d="{area}"/>'
+        f'<path class="line" d="{path}"/>{dots}{labels}</svg>'
+    )
+
+
+def chart_section(crawler: dict, name: str, blocks: dict) -> str:
+    key = block_key(crawler, name, blocks)
+    if not key:
+        return '<div class="nodata">No block-rate data for this crawler.</div>'
+    series = blocks[key]
+    if not series:
+        return '<div class="nodata">No block-rate data for this crawler.</div>'
+    latest_ts = max(int(t) for t in series)
+    latest = series[str(latest_ts)] if str(latest_ts) in series else series[latest_ts]
+    date = datetime.fromtimestamp(latest_ts, timezone.utc).date().isoformat()
+    return (
+        '<div class="chart"><div class="top">'
+        f'<div class="big">{fmt_pct(latest)}<small>%</small></div>'
+        f'<div class="meta-r">latest snapshot<br>{date}<br>'
+        f"matched key: {html.escape(key)}</div></div>"
+        f"{chart_svg({str(t): v for t, v in series.items()})}</div>"
+    )
+
+
+def htaccess_pattern(pattern: str) -> str:
+    return pattern.replace('"', '\\"')
+
+
+def nginx_pattern(pattern: str) -> str:
+    return pattern.replace("\\", "\\\\").replace('"', '\\"')
+
+
 def fill(template: str, values: dict[str, str]) -> str:
     out = template
     for key, value in values.items():
@@ -70,7 +179,9 @@ def fill(template: str, values: dict[str, str]) -> str:
     return out
 
 
-def build_values(crawler: dict, name: str, slug: str) -> dict[str, str]:
+def build_values(
+    crawler: dict, name: str, slug: str, blocks: dict
+) -> dict[str, str]:
     pattern = crawler.get("pattern", "")
     description = crawler.get("description") or f"{name} web crawler user-agent details."
     tags = crawler.get("tags") or ["uncategorized"]
@@ -176,6 +287,9 @@ def build_values(crawler: dict, name: str, slug: str) -> dict[str, str]:
         "INSTANCE_COUNT": str(len(instances)),
         "REF_ROW": ref_row,
         "ADDED_ROW": added_row,
+        "CHART_SECTION": chart_section(crawler, name, blocks),
+        "HTACCESS_PATTERN": html.escape(htaccess_pattern(pattern)),
+        "NGINX_PATTERN": html.escape(nginx_pattern(pattern)),
     }
 
 
@@ -221,6 +335,7 @@ def write_sitemap(entries: list[tuple[str, str]]) -> None:
 def main() -> int:
     crawlers = json.loads((ROOT / "crawlers.json").read_text())
     template = TEMPLATE_PATH.read_text()
+    blocks = json.loads(BLOCKS_PATH.read_text()) if BLOCKS_PATH.exists() else {}
     DOCS.mkdir(exist_ok=True)
 
     seen: set[str] = set()
@@ -234,7 +349,7 @@ def main() -> int:
             slug = f"{original}-{counter}"
             counter += 1
         seen.add(slug)
-        page = fill(template, build_values(crawler, name, slug))
+        page = fill(template, build_values(crawler, name, slug, blocks))
         (DOCS / f"{slug}.html").write_text(page)
         entries.append((name, slug))
 
