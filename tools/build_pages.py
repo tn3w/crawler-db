@@ -125,7 +125,8 @@ def build_values(crawler: dict, name: str, slug: str) -> dict[str, str]:
     domain = domain_of(url)
     favicon = f"https://icons.duckduckgo.com/ip3/{domain}.ico" if domain else ""
     icon_html = (
-        f'<img src="{favicon}" alt="{html.escape(name)} icon" '
+        f'<img src="{favicon}" alt="" width="64" height="64" '
+        f'loading="lazy" decoding="async" '
         f"onerror=\"this.parentNode.textContent='{html.escape(initials(name))}'\">"
         if favicon
         else html.escape(initials(name))
