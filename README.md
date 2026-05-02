@@ -85,6 +85,12 @@ python3 tools/build_pages.py
 python3 -m http.server -d docs
 ```
 
+Clean up:
+
+```
+find docs -type f \( -name "*.html" ! -name "index.html" ! -name "404.html" ! -name "_crawler-template.html" \) -o \( -name "robots.txt" -o -name "sitemap.xml" \) -delete
+```
+
 ## Social preview banner
 
 ```bash
