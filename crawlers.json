@@ -531,7 +531,7 @@
     ]
   },
   {
-    "pattern": "grub\\.org",
+    "pattern": "grub-client",
     "instances": [
       "Mozilla/4.0 (compatible; grub-client-0.3.0; Crawl your own stuff with http://grub.org)",
       "Mozilla/4.0 (compatible; grub-client-1.0.4; Crawl your own stuff with http://grub.org)",
@@ -6717,7 +6717,9 @@
     "addition_date": "2023/02/16",
     "url": "https://www.dynatrace.com/support/help/platform-modules/digital-experience/synthetic-monitoring/browser-monitors/configure-browser-monitors#expand--default-user-agent",
     "instances": [
-      "RuxitSynthetic/1.0"
+      "RuxitSynthetic/1.0",
+      "Mozilla/5.0 (X11; Ubuntu; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 RuxitSynthetic/1.0 v0 t0 ath0 alt0 cfeatureHash=7efgijmoqtvx caes=1 ccux=1 sia=1 smf=1",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 RuxitSynthetic/1.0 v0 t0 cfeatureHash=7efgijmoqtvx caes=1 ccux=1 sia=1 smf=1"
     ],
     "description": "Dynatrace Ruxit synthetic web crawler",
     "tags": [
@@ -16073,5 +16075,177 @@
     "addition_date": "2026/05/02",
     "description": "Alibaba Etao shopping search engine crawler",
     "tags": ["search-engine"]
+  },
+  {
+    "pattern": "Alibaba\\.Security\\.Heimdall",
+    "url": "https://udger.com/resources/ua-list/bot-detail?bot=Alibaba+crawler",
+    "instances": [
+      "Alibaba.Security.Heimdall"
+    ],
+    "addition_date": "2026/05/02",
+    "description": "Alibaba Group security scanning bot",
+    "tags": ["scanner"]
+  },
+  {
+    "pattern": "[Jj]ikespider",
+    "url": "http://shoulu.jike.com/spider.html",
+    "instances": [
+      "jikespider (\"Mozilla/5.0)",
+      "jikespider \"Mozilla/5.0",
+      "Mozilla/5.0 (compatible; JikeSpider; +http://shoulu.jike.com/spider.html)"
+    ],
+    "addition_date": "2026/05/02",
+    "description": "Defunct Chinese state search engine crawler merged 2014",
+    "tags": ["search-engine"]
+  },
+  {
+    "pattern": "Burp Suite",
+    "url": "https://portswigger.net/burp",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "PortSwigger web application security testing platform",
+    "tags": ["scanner"]
+  },
+  {
+    "pattern": "Rapid7",
+    "url": "https://www.rapid7.com/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "Rapid7 vulnerability scanner and security testing platform",
+    "tags": ["scanner"]
+  },
+  {
+    "pattern": "nuclei",
+    "url": "https://docs.projectdiscovery.io/opensource/nuclei/running",
+    "instances": ["Mozilla/5.0 (Windows NT 10.0; WOW64) / nuclei"],
+    "addition_date": "2026/05/02",
+    "description": "ProjectDiscovery fast customizable vulnerability scanner",
+    "tags": ["scanner"]
+  },
+  {
+    "pattern": "Siteliner",
+    "url": "http://www.siteliner.com/bot",
+    "instances": [
+      "Mozilla/5.0 (compatible; Siteliner/1.0; +http://www.siteliner.com/bot)"
+    ],
+    "addition_date": "2026/05/02",
+    "description": "Indigo Stream website analysis and duplicate content checker",
+    "tags": ["seo"]
+  },
+  {
+    "pattern": "mabl",
+    "url": "https://help.mabl.com/hc/en-us/articles/18967650734228",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "mabl cloud test automation platform for web testing",
+    "tags": ["browser-automation"]
+  },
+  {
+    "pattern": "Metasploit",
+    "url": "https://www.metasploit.com/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "Rapid7 penetration testing and exploitation framework",
+    "tags": ["scanner"]
+  },
+  {
+    "pattern": "OWASP ZAP",
+    "url": "https://www.zaproxy.org/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "Zed Attack Proxy web application security scanner",
+    "tags": ["scanner"]
+  },
+  {
+    "pattern": "Copyscape",
+    "url": "https://www.copyscape.com/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "Indigo Stream plagiarism detection and content protection",
+    "tags": ["seo"]
+  },
+  {
+    "pattern": "BrowserStack",
+    "url": "https://www.browserstack.com/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "Cloud cross-browser testing platform using real browsers",
+    "tags": ["browser-automation"]
+  },
+  {
+    "pattern": "Sauce Labs",
+    "url": "https://saucelabs.com/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "Cloud continuous testing platform for cross-browser testing",
+    "tags": ["browser-automation"]
+  },
+  {
+    "pattern": "LambdaTest",
+    "url": "https://www.lambdatest.com/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "Cloud cross-browser testing platform using real browsers",
+    "tags": ["browser-automation"]
+  },
+  {
+    "pattern": "Testim",
+    "url": "https://www.testim.io/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "AI-powered test automation platform using real browsers",
+    "tags": ["browser-automation"]
+  },
+  {
+    "pattern": "Katalon",
+    "url": "https://www.katalon.com/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "Test automation platform using real browser engines",
+    "tags": ["browser-automation"]
+  },
+  {
+    "pattern": "Cypress",
+    "url": "https://www.cypress.io/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "JavaScript end-to-end testing framework using Chromium",
+    "tags": ["browser-automation"]
+  },
+  {
+    "pattern": "DynatraceSynthetic",
+    "url": "https://www.dynatrace.com/support/help/how-to-use-dynatrace/synthetic-monitoring",
+    "instances": [
+      "DynatraceSynthetic/1.179"
+    ],
+    "addition_date": "2026/05/02",
+    "description": "Dynatrace synthetic monitoring HTTP checks",
+    "tags": ["monitoring"]
+  },
+  {
+    "pattern": "GomezAgent",
+    "url": "https://www.compuware.com/",
+    "instances": [
+      "Mozilla/5.0 (Windows NT 6.3; WOW64; GomezAgent 3.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1916.153 Safari/537.36"
+    ],
+    "addition_date": "2026/05/02",
+    "description": "Legacy Compuware Gomez APM synthetic monitoring recorder",
+    "tags": ["monitoring"]
+  },
+  {
+    "pattern": "Prisync",
+    "url": "https://prisync.com/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "Price monitoring service intentionally concealing bot identity",
+    "tags": ["seo"]
+  },
+  {
+    "pattern": "Price2Spy",
+    "url": "https://www.price2spy.com/",
+    "instances": [],
+    "addition_date": "2026/05/02",
+    "description": "Price monitoring service bypassing bot protection systems",
+    "tags": ["seo"]
   }
 ]
