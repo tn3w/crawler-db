@@ -8,13 +8,16 @@ import html
 import json
 from pathlib import Path
 import re
+import shutil
 import sys
 from urllib.parse import quote
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
+DIST = ROOT / "dist"
 TEMPLATE_PATH = DOCS / "_crawler-template.html"
 BLOCKS_PATH = DOCS / "data" / "crawler-block-percentages.json"
+SOURCE_FILES = ("index.html", "404.html", "CNAME")
 SITE = "https://crawlerdex.tn3w.dev"
 
 
@@ -327,7 +330,7 @@ def write_robots(entries: list[tuple[str, str]]) -> None:
         lines.append("")
     lines.append(f"Sitemap: {SITE}/sitemap.xml")
     lines.append("")
-    (DOCS / "robots.txt").write_text("\n".join(lines))
+    (DIST / "robots.txt").write_text("\n".join(lines))
 
 
 def write_sitemap(entries: list[tuple[str, str]]) -> None:
@@ -348,14 +351,26 @@ def write_sitemap(entries: list[tuple[str, str]]) -> None:
         + "\n".join(urls)
         + "\n</urlset>\n"
     )
-    (DOCS / "sitemap.xml").write_text(body)
+    (DIST / "sitemap.xml").write_text(body)
 
 
 def main() -> int:
     crawlers = json.loads((ROOT / "crawlers.json").read_text())
     template = TEMPLATE_PATH.read_text()
     blocks = json.loads(BLOCKS_PATH.read_text()) if BLOCKS_PATH.exists() else {}
-    DOCS.mkdir(exist_ok=True)
+
+    if DIST.exists():
+        shutil.rmtree(DIST)
+    DIST.mkdir()
+
+    for name in SOURCE_FILES:
+        src = DOCS / name
+        if src.exists():
+            shutil.copy2(src, DIST / name)
+
+    data_src = DOCS / "data"
+    if data_src.exists():
+        shutil.copytree(data_src, DIST / "data")
 
     seen: set[str] = set()
     entries: list[tuple[str, str]] = []
@@ -369,18 +384,18 @@ def main() -> int:
             counter += 1
         seen.add(slug)
         page = fill(template, build_values(crawler, name, slug, blocks))
-        (DOCS / f"{slug}.html").write_text(page)
+        (DIST / f"{slug}.html").write_text(page)
         entries.append((name, slug))
 
     write_robots(entries)
     write_sitemap(entries)
     inject_index_links(entries)
-    print(f"generated {len(entries)} crawler pages")
+    print(f"generated {len(entries)} crawler pages → dist/")
     return 0
 
 
 def inject_index_links(entries: list[tuple[str, str]]) -> None:
-    index_path = DOCS / "index.html"
+    index_path = DIST / "index.html"
     text = index_path.read_text()
     placeholder = "<!--CRAWLER_LINKS-->"
     if placeholder not in text:

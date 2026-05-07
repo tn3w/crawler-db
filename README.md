@@ -50,11 +50,12 @@ https://github.com/tn3w/Crawlerdex/releases/latest/download/crawlers.min.json   
 
 ## Frontend
 
-`docs/index.html`: searchable bestiary. Paste a UA, longest-match wins. Click a chip to filter by tag. Block-rate from [robots-radar](https://github.com/tn3w/robots-radar). Static SEO pages built by `tools/build_pages.py` from `docs/_crawler-template.html`.
+`docs/` = source (`index.html`, `404.html`, `_crawler-template.html`, `CNAME`). `tools/build_pages.py` reads template + `docs/data/` → emits per-crawler pages, `robots.txt`, `sitemap.xml`, copies sources into `dist/`. Pages deploy from `dist/`. rDNS suffixes shown in modal + per-crawler page (FCrDNS section). Block-rate from [robots-radar](https://github.com/tn3w/robots-radar).
 
 ```bash
+mkdir -p docs/data && cp crawlers.json docs/data/
 python3 tools/build_pages.py
-python3 -m http.server -d docs
+python3 -m http.server -d dist
 ```
 
 ## Validation
