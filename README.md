@@ -2,7 +2,7 @@
 
 > the bestiary of bots
 
-**1600+ crawler user-agents.** Detection regex, real UA samples, rDNS verification, live block-rates. → [crawlerdex.tn3w.dev](https://crawlerdex.tn3w.dev)
+**2900+ crawler user-agents.** Detection regex, real UA samples, rDNS verification, live block-rates. → [crawlerdex.tn3w.dev](https://crawlerdex.tn3w.dev)
 
 Download:
 
