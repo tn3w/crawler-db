@@ -1,17 +1,15 @@
 name: Deploy Demo Page
 
 on:
+  workflow_run:
+    workflows: [Release crawlers.json]
+    types: [completed]
   push:
     branches: [master]
     paths:
       - docs/**
       - tools/build_pages.py
       - .github/workflows/deploy-pages.yml
-  workflow_run:
-    workflows: [Update Feeds]
-    types: [completed]
-  schedule:
-    - cron: '0 5 * * *'
   workflow_dispatch:
 
 permissions:
@@ -39,13 +37,14 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Download demo data
+      - name: Stage data from latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p docs/data
           cp crawlers.json docs/data/crawlers.json
-          curl -fsSL \
-            https://github.com/tn3w/robots-radar/releases/latest/download/crawler-block-percentages.json \
-            -o docs/data/crawler-block-percentages.json
+          gh release download --pattern crawler-block-percentages.json \
+            --dir docs/data --clobber
 
       - name: Build per-crawler SEO pages, robots.txt, sitemap.xml
         run: python3 tools/build_pages.py

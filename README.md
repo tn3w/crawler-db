@@ -7,8 +7,11 @@
 Download:
 
 ```
-https://github.com/tn3w/Crawlerdex/releases/latest/download/crawlers.json       # full
-https://github.com/tn3w/Crawlerdex/releases/latest/download/crawlers.min.json   # no instances, no addition_date, minified (~57% smaller)
+https://github.com/tn3w/Crawlerdex/releases/latest/download/crawlers.json                    # full
+https://github.com/tn3w/Crawlerdex/releases/latest/download/crawlers.min.json                # no instances, no addition_date, minified (~57% smaller)
+https://github.com/tn3w/Crawlerdex/releases/latest/download/crawler-stats.json               # per-crawler aggregate block-rate stats
+https://github.com/tn3w/Crawlerdex/releases/latest/download/crawler-block-percentages.json   # block-rate time series
+https://github.com/tn3w/Crawlerdex/releases/latest/download/domain-crawler-blocks.json       # per-domain allow/block map
 ```
 
 ---
@@ -50,13 +53,25 @@ https://github.com/tn3w/Crawlerdex/releases/latest/download/crawlers.min.json   
 
 ## Frontend
 
-`docs/` = source (`index.html`, `404.html`, `_crawler-template.html`, `CNAME`). `tools/build_pages.py` reads template + `docs/data/` → emits per-crawler pages, `robots.txt`, `sitemap.xml`, copies sources into `dist/`. Pages deploy from `dist/`. rDNS suffixes shown in modal + per-crawler page (FCrDNS section). Block-rate from [robots-radar](https://github.com/tn3w/robots-radar).
+`docs/` = source (`index.html`, `404.html`, `_crawler-template.html`, `CNAME`). `tools/build_pages.py` reads template + `docs/data/` → emits per-crawler pages, `robots.txt`, `sitemap.xml`, copies sources into `dist/`. Pages deploy from `dist/`. rDNS suffixes shown in modal + per-crawler page (FCrDNS section). Block-rate produced by `tools/radar.py`.
 
 ```bash
 mkdir -p docs/data && cp crawlers.json docs/data/
 python3 tools/build_pages.py
 python3 -m http.server -d dist
 ```
+
+## Block-rate radar
+
+`tools/radar.py` fetches Tranco top-N×1000 `robots.txt`, parses allow/disallow per UA, accumulates block-rate stats and time series.
+
+```bash
+pip install httpx
+python3 tools/radar.py
+```
+
+Flags: `--top-thousands` (default 25), `--max-workers` (512), `--timeout` (3s).
+Outputs (minified JSON): `crawler-stats.json`, `crawler-block-percentages.json`, `domain-crawler-blocks.json`.
 
 ## Validation
 
@@ -82,6 +97,11 @@ npx --yes prettier --write --single-quote --print-width=100 --trailing-comma=es5
 python3 -m venv .venv && source .venv/bin/activate && pip install Pillow
 python banner.py
 ```
+
+## CI
+
+- `release-crawlers.yml` — push to `crawlers.json` / `tools/radar.py`, daily cron, or manual: rebuild `crawlers.min.json`, run radar, publish all artifacts as a GitHub release. Keeps last 5.
+- `deploy-pages.yml` — runs after a successful release (also on `docs/` changes or manual): pulls `crawler-block-percentages.json` from latest release, builds + minifies pages, deploys to GitHub Pages.
 
 ## Credits
 
