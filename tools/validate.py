@@ -31,6 +31,7 @@ ALLOWED_TAGS = {
 }
 REQUIRED_KEYS = {"pattern", "description", "tags", "instances"}
 ALLOWED_KEYS = REQUIRED_KEYS | {"url", "addition_date", "depends_on", "rdns"}
+KEY_ORDER = ["pattern", "url", "instances", "description", "tags", "addition_date", "depends_on", "rdns"]
 EXCLUSIVE_TAG_GROUPS = [{"ai-crawler", "ai-fetcher"}]
 
 DATE_RE = re.compile(r"^\d{4}/(0[1-9]|1[0-2])/(0[1-9]|[12]\d|3[01])$")
@@ -45,6 +46,11 @@ REDOS_HEURISTICS = [
 ]
 TOO_PERMISSIVE = {".*", ".+", ".", r"\w+", r"\w*", r"\S+", r"\S*", r"\b\w+\b"}
 MIN_LITERAL_CHARS = 3
+MAX_PATTERN_LEN = 120
+MAX_INSTANCE_LEN = 300
+MAX_DESCRIPTION_CHARS = 100
+MAX_DESCRIPTION_WORDS = 10
+MAX_URL_LEN = 400
 PATTERN_BUDGET = 0.05
 REDOS_PROBE = "A" * 5000 + "!"
 
@@ -101,7 +107,7 @@ def check_str(i: int, label: str, val, max_len: int | None = None) -> bool:
     if CTRL_RE.search(val):
         err(f"[{i}] {label} has control characters")
     if max_len and len(val) > max_len:
-        warn(f"[{i}] {label} >{max_len} chars: {len(val)}")
+        err(f"[{i}] {label} too long ({len(val)} > {max_len} chars)")
     return True
 
 
@@ -127,9 +133,10 @@ def validate_instances(i: int, instances) -> None:
         err(f"[{i}] instances must be list")
         return
     for j, s in enumerate(instances):
-        check_str(i, f".instances[{j}]", s) if isinstance(s, str) and s else err(
-            f"[{i}].instances[{j}] not non-empty string"
-        )
+        if isinstance(s, str) and s:
+            check_str(i, f".instances[{j}]", s, max_len=MAX_INSTANCE_LEN)
+        else:
+            err(f"[{i}].instances[{j}] not non-empty string")
     strs = [s for s in instances if isinstance(s, str)]
     if len(strs) != len(set(strs)):
         err(f"[{i}] duplicate instance strings")
@@ -138,8 +145,11 @@ def validate_instances(i: int, instances) -> None:
 def validate_url(i: int, url) -> None:
     if not isinstance(url, str) or not url.startswith(("http://", "https://")):
         err(f"[{i}] url must be http(s) string")
-    elif url != url.strip():
+        return
+    if url != url.strip():
         err(f"[{i}] url has whitespace")
+    if len(url) > MAX_URL_LEN:
+        err(f"[{i}] url too long ({len(url)} > {MAX_URL_LEN} chars)")
 
 
 def validate_date(i: int, added) -> None:
@@ -183,8 +193,13 @@ def validate_entry(i: int, e: dict) -> None:
     p = e.get("pattern")
     if not isinstance(p, str) or not p:
         err(f"[{i}] pattern must be non-empty string")
+    elif len(p) > MAX_PATTERN_LEN:
+        err(f"[{i}] pattern too long ({len(p)} > {MAX_PATTERN_LEN} chars)")
 
-    check_str(i, "description", e.get("description"), max_len=200)
+    desc = e.get("description")
+    if check_str(i, "description", desc, max_len=MAX_DESCRIPTION_CHARS) and isinstance(desc, str):
+        if len(desc.split()) > MAX_DESCRIPTION_WORDS:
+            err(f"[{i}] description too long ({len(desc.split())} > {MAX_DESCRIPTION_WORDS} words)")
     validate_tags(i, e.get("tags"))
     validate_instances(i, e.get("instances"))
 
@@ -234,6 +249,8 @@ def check_pattern(i: int, p: str, compiled: re.Pattern) -> None:
         warn(f"[{i}] pattern fully anchored: {p!r}")
     if re.search(r"\\([a-zA-Z0-9])", p) and not re.search(r"\\[bBwWsSdDnrtfv]", p):
         warn(f"[{i}] possibly redundant escape: {p!r}")
+    if re.search(r"\\/\d[\d\\.]*", p):
+        err(f"[{i}] pattern contains hardcoded version number: {p!r}")
 
 
 def validate_patterns(entries: list) -> list:
@@ -349,8 +366,11 @@ def main() -> int:
     validate_pattern_instances(compiled)
     validate_cross_matches(compiled)
     validate_depends_on(entries)
-    if raw != json.dumps(entries, indent=2, ensure_ascii=False) + "\n":
-        err("crawlers.json formatting is not canonical")
+    ordered = [{k: e[k] for k in KEY_ORDER if k in e} for e in entries]
+    canonical = json.dumps(ordered, indent=2, ensure_ascii=False) + "\n"
+    if raw != canonical:
+        PATH.write_text(canonical)
+        print("crawlers.json reformatted to canonical form")
     validate_browser_safety(compiled)
     print_stats(entries)
 
