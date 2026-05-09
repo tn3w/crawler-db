@@ -21,7 +21,7 @@ import httpx
 warnings.filterwarnings("ignore", category=Warning)
 
 TRANCO_URL = "https://tranco-list.eu/top-1m.csv.zip"
-RELEASE_LATEST = "https://github.com/tn3w/Crawlerdex/releases/latest/download"
+RELEASE_LATEST = "https://github.com/tn3w/robots-radar/releases/latest/download"
 DOMAIN_FILE = "domain-crawler-blocks.json"
 TIMESERIES_FILE = "crawler-block-percentages.json"
 CRAWLERS_FILE = "crawler-stats.json"
